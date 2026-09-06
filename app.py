@@ -1,3 +1,8 @@
+import os
+if not os.path.exists("model/model.pkl"):
+    import subprocess
+    subprocess.run(["python", "model/train_model.py"])
+
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from functools import wraps
 import pickle, os, numpy as np
