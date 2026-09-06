@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NutriScan — Child Malnutrition Risk Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="page-login" class="login-page">
+  <div class="floating-shapes">
+    <div class="shape s1"></div><div class="shape s2"></div>
+    <div class="shape s3"></div><div class="shape s4"></div><div class="shape s5"></div>
+  </div>
+  <div class="login-card">
+    <div class="login-top">
+      <div class="login-logo">🔬</div>
+      <h1 class="login-title">NutriScan</h1>
+      <p class="login-sub">Child Malnutrition Risk Predictor</p>
+    </div>
+    <div id="login-error" class="alert-danger" style="display:none;padding:10px 14px;border-radius:10px;font-size:.85rem;font-weight:700;margin-bottom:14px;background:#fff0f0;color:#cc2233;border:1.5px solid rgba(255,71,87,.25)"></div>
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <div class="input-icon-wrap">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input class="form-input" type="email" id="login-email" placeholder="doctor@nutriscan.com"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="input-icon-wrap">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <input class="form-input" type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+    </div>
+    <div class="divider"><div class="divider-line"></div><span class="divider-text">Quick demo login</span><div class="divider-line"></div></div>
+    <div class="demo-grid">
+      <button class="demo-btn" onclick="fillDemo('doctor@nutriscan.com','doctor123')">👨‍⚕️ Doctor</button>
+      <button class="demo-btn" onclick="fillDemo('worker@nutriscan.com','worker123')">🏥 Health Worker</button>
+      <button class="demo-btn" onclick="fillDemo('research@nutriscan.com','research123')">🔬 Researcher</button>
+      <button class="demo-btn" onclick="fillDemo('admin@nutriscan.com','admin123')">👤 Admin</button>
+    </div>
+    <button class="primary-btn" onclick="doLogin()">🚀 Sign in to NutriScan</button>
+    <div class="security-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <p>Secured &amp; compliant with health data regulations. Patient data is encrypted.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" class="app" style="display:none">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🔬</div>
+      <div>
+        <div class="sidebar-logo-name">NutriScan</div>
+        <div class="sidebar-logo-sub">Child Health System</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)"><span class="nav-emoji">📊</span>Dashboard</button>
+      <button class="nav-item" id="nav-predict" data-page="predict" onclick="showPage('predict',this)"><span class="nav-emoji">🔍</span>Predict Risk<span class="nav-badge">ML</span></button>
+      <button class="nav-item" data-page="records" onclick="showPage('records',this)"><span class="nav-emoji">📋</span>Patient Records</button>
+      <button class="nav-item" id="nav-users" data-page="users" onclick="showPage('users',this)" style="display:none"><span class="nav-emoji">👥</span>Manage Users</button>
+      <div class="nav-section">Account</div>
+      <button class="nav-item" onclick="doLogout()"><span class="nav-emoji">🚪</span>Logout</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-av" id="sidebar-av">DR</div>
+      <div>
+        <div class="user-name" id="sidebar-name">Loading...</div>
+        <div class="user-role" id="sidebar-role">—</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="topbar">
+        <div><h2 class="page-title">📊 Dashboard</h2><p class="page-sub">Overview of child malnutrition risk data</p></div>
+        <div class="topbar-actions">
+          <span class="chip chip-blue">📅 April 2026</span>
+          <button class="chip chip-green" id="btn-new-predict" onclick="showPage('predict',null)">+ New Prediction</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stats-grid">
+          <div class="stat-card sc-blue" data-emoji="👶"><div class="stat-label">Total Screened</div><div class="stat-value" id="d-total">0</div><div class="stat-sub">children assessed</div></div>
+          <div class="stat-card sc-red" data-emoji="⚠️"><div class="stat-label">At Risk</div><div class="stat-value" id="d-risk">0</div><div class="stat-sub">need attention</div></div>
+          <div class="stat-card sc-green" data-emoji="✅"><div class="stat-label">Healthy</div><div class="stat-value" id="d-healthy">0</div><div class="stat-sub">normal growth</div></div>
+          <div class="stat-card sc-orange" data-emoji="📈"><div class="stat-label">Risk Rate</div><div class="stat-value" id="d-rate">0%</div><div class="stat-sub">overall</div></div>
+        </div>
+        <div class="chart-grid">
+          <div class="card"><div class="card-header"><h3>📊 Risk by Wealth</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="wealthChart"></canvas></div></div></div>
+          <div class="card"><div class="card-header"><h3>🎓 Risk by Education</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="eduChart"></canvas></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>🕐 Recent Predictions</h3><button class="chip chip-blue" onclick="showPage('records',null)">View all →</button></div>
+          <div class="card-body" id="recent-list"><div class="empty-state"><span>🍼</span><p>No predictions yet. Use Predict Risk to get started!</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREDICT -->
+    <div class="page" id="page-predict">
+      <div class="topbar">
+        <div><h2 class="page-title">🔍 Predict Risk</h2><p class="page-sub">Enter child details to assess malnutrition risk using AI</p></div>
+        <div class="topbar-actions"><span class="chip chip-orange">🤖 Random Forest · 83% accuracy</span></div>
+      </div>
+      <div class="content">
+        <div class="card" style="max-width:820px">
+          <div class="card-header"><h3>👶 Child Information Form</h3></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="form-label">Child's full name</label>
+                <input class="form-input" type="text" id="f-name" placeholder="e.g. Arjun Kumar"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Age (months)</label>
+                <input class="form-input" type="number" id="f-age" placeholder="1–60" min="1" max="60"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Weight (kg)</label>
+                <input class="form-input" type="number" id="f-weight" placeholder="e.g. 8.5" step="0.1"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Height (cm)</label>
+                <input class="form-input" type="number" id="f-height" placeholder="e.g. 72" step="0.1"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Number of siblings</label>
+                <input class="form-input" type="number" id="f-siblings" placeholder="0–10" min="0"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mother's education</label>
+                <select class="form-input" id="f-edu">
+                  <option value="">Select...</option>
+                  <option value="none">None</option>
+                  <option value="primary">Primary</option>
+                  <option value="secondary">Secondary</option>
+                  <option value="higher">Higher</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Wealth index</label>
+                <select class="form-input" id="f-wealth">
+                  <option value="">Select...</option>
+                  <option value="poor">Poor</option>
+                  <option value="middle">Middle</option>
+                  <option value="rich">Rich</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">🚰 Clean water access</label>
+                <div class="toggle-wrap">
+                  <button class="tog" id="tw-y" onclick="tog('tw','y')">✅ Yes</button>
+                  <button class="tog tog-off" id="tw-n" onclick="tog('tw','n')">❌ No</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">🚽 Sanitation facility</label>
+                <div class="toggle-wrap">
+                  <button class="tog" id="ts-y" onclick="tog('ts','y')">✅ Yes</button>
+                  <button class="tog tog-off" id="ts-n" onclick="tog('ts','n')">❌ No</button>
+                </div>
+              </div>
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="form-label">🤱 Was child breastfed?</label>
+                <div class="toggle-wrap" style="max-width:300px">
+                  <button class="tog tog-on" id="tb-y" onclick="tog('tb','y')">✅ Yes</button>
+                  <button class="tog" id="tb-n" onclick="tog('tb','n')">❌ No</button>
+                </div>
+              </div>
+            </div>
+            <button class="primary-btn" id="predict-btn" onclick="runPredict()">🔬 Analyse Malnutrition Risk</button>
+            <div id="result-box" class="result-box" style="display:none">
+              <div class="result-header">
+                <span id="r-emoji" style="font-size:2.2rem;line-height:1"></span>
+                <div><div id="r-title" class="result-title"></div><div id="r-prob" class="result-prob"></div></div>
+              </div>
+              <div class="prob-bar-lg"><div id="r-fill" class="prob-bar-fill" style="width:0%"></div></div>
+              <div id="r-tips" class="result-tips"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECORDS -->
+    <div class="page" id="page-records">
+      <div class="topbar">
+        <div><h2 class="page-title">📋 Patient Records</h2><p class="page-sub">All screened children and their risk assessments</p></div>
+        <div class="topbar-actions">
+          <button class="chip chip-blue" id="btn-export" onclick="exportCSV()">📥 Export CSV</button>
+          <button class="chip chip-green" id="btn-add-rec" onclick="showPage('predict',null)">+ Add Record</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stats-grid">
+          <div class="stat-card sc-blue" data-emoji="👶"><div class="stat-label">Total</div><div class="stat-value" id="r-total">0</div><div class="stat-sub">screened</div></div>
+          <div class="stat-card sc-red" data-emoji="⚠️"><div class="stat-label">At Risk</div><div class="stat-value" id="r-atrisk">0</div><div class="stat-sub">need care</div></div>
+          <div class="stat-card sc-green" data-emoji="✅"><div class="stat-label">Healthy</div><div class="stat-value" id="r-healthy">0</div><div class="stat-sub">normal</div></div>
+          <div class="stat-card sc-orange" data-emoji="📈"><div class="stat-label">Risk Rate</div><div class="stat-value" id="r-rate">0%</div><div class="stat-sub">percentage</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>All Records</h3><span id="rec-count" class="text-muted">0 records</span></div>
+          <div class="card-body" style="padding-bottom:0">
+            <div class="tab-row">
+              <button class="tab-btn active" onclick="filterTab(this,'all')">All</button>
+              <button class="tab-btn" onclick="filterTab(this,'risk')">⚠️ At Risk</button>
+              <button class="tab-btn" onclick="filterTab(this,'safe')">✅ Healthy</button>
+            </div>
+            <div class="filter-bar">
+              <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input class="form-input" type="text" id="search-inp" placeholder="Search by name..." oninput="renderTable()"/>
+              </div>
+              <select class="form-input filter-select" id="fw-filter" onchange="renderTable()">
+                <option value="">All wealth</option><option value="poor">Poor</option><option value="middle">Middle</option><option value="rich">Rich</option>
+              </select>
+              <select class="form-input filter-select" id="fe-filter" onchange="renderTable()">
+                <option value="">All education</option><option value="none">None</option><option value="primary">Primary</option><option value="secondary">Secondary</option><option value="higher">Higher</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Child</th><th>Age</th><th>Weight / Height</th><th>Wealth</th><th>Education</th><th>Risk %</th><th>Status</th><th id="th-actions">Actions</th>
+              </tr></thead>
+              <tbody id="rec-tbody"></tbody>
+            </table>
+          </div>
+          <div class="pagination"><p id="pg-info">Page 1 of 1</p><div id="pg-btns" class="pg-btns"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS (Admin only) -->
+    <div class="page" id="page-users">
+      <div class="topbar">
+        <div><h2 class="page-title">👥 Manage Users</h2><p class="page-sub">View all system users and their roles</p></div>
+      </div>
+      <div class="content">
+        <div class="card"><div class="card-header"><h3>System Users</h3></div><div class="card-body" id="users-list"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
